@@ -15,12 +15,13 @@ def render_sidebar():
         # LLM提供商选择
         llm_provider = st.selectbox(
             "LLM提供商",
-            options=["dashscope", "deepseek", "google"],
+            options=["dashscope", "deepseek", "google", "openai"],
             index=0,
             format_func=lambda x: {
                 "dashscope": "阿里百炼",
                 "deepseek": "DeepSeek V3",
-                "google": "Google AI"
+                "google": "Google AI",
+                "openai": "OpenAI"
             }[x],
             help="选择AI模型提供商"
         )
@@ -50,7 +51,7 @@ def render_sidebar():
                 }[x],
                 help="选择用于分析的DeepSeek模型"
             )
-        else:  # google
+        elif llm_provider == "google":
             llm_model = st.selectbox(
                 "选择Google模型",
                 options=["gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.5-flash"],
@@ -62,6 +63,47 @@ def render_sidebar():
                 }[x],
                 help="选择用于分析的Google Gemini模型"
             )
+        else:  # openai
+            # OpenAI配置
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                # 预设模型选择
+                preset_model = st.selectbox(
+                    "预设模型",
+                    options=["gpt-4.1", "gemini-2.5-pro-preview-06-05", "custom"],
+                    index=0,
+                    format_func=lambda x: {
+                        "gpt-4.1": "GPT-4 - 最强性能",
+                        "gemini-2.5-pro-preview-06-05": "Gemini 2.5 Pro - 最新预览版",
+                        "custom": "自定义模型"
+                    }[x],
+                    help="选择预设的OpenAI模型或自定义"
+                )
+            
+            with col2:
+                # 自定义Base URL
+                default_base_url = os.getenv('OPENAI_BASE_URL', 'https://api.openai.com/v1')
+                custom_base_url = st.text_input(
+                    "自定义Base URL",
+                    value=default_base_url,
+                    placeholder="https://api.openai.com/v1",
+                    help="OpenAI API的Base URL，可以是官方API或兼容的第三方API。默认从环境变量OPENAI_BASE_URL读取"
+                )
+            
+            # 如果选择自定义模型，显示输入框
+            if preset_model == "custom":
+                llm_model = st.text_input(
+                    "自定义模型名称",
+                    value="gpt-4",
+                    placeholder="输入模型名称，如: gpt-4, claude-3-opus等",
+                    help="输入要使用的模型名称"
+                )
+            else:
+                llm_model = preset_model
+            
+            # 存储自定义配置到session state
+            st.session_state.openai_base_url = custom_base_url
         
         # 高级设置
         with st.expander("⚙️ 高级设置"):
@@ -219,5 +261,6 @@ def render_sidebar():
         'llm_model': llm_model,
         'enable_memory': enable_memory,
         'enable_debug': enable_debug,
-        'max_tokens': max_tokens
+        'max_tokens': max_tokens,
+        'openai_base_url': st.session_state.get('openai_base_url', 'https://api.openai.com/v1')
     }

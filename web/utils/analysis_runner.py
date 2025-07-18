@@ -97,7 +97,7 @@ def extract_risk_assessment(state):
         logger.info(f"提取风险评估数据时出错: {e}")
         return None
 
-def run_stock_analysis(stock_symbol, analysis_date, analysts, research_depth, llm_provider, llm_model, market_type="美股", progress_callback=None):
+def run_stock_analysis(stock_symbol, analysis_date, analysts, research_depth, llm_provider, llm_model, market_type="美股", progress_callback=None, openai_base_url=None):
     """执行股票分析
 
     Args:
@@ -105,9 +105,11 @@ def run_stock_analysis(stock_symbol, analysis_date, analysts, research_depth, ll
         analysis_date: 分析日期
         analysts: 分析师列表
         research_depth: 研究深度
-        llm_provider: LLM提供商 (dashscope/deepseek/google)
+        llm_provider: LLM提供商 (dashscope/deepseek/google/openai)
         llm_model: 大模型名称
+        market_type: 市场类型
         progress_callback: 进度回调函数，用于更新UI状态
+        openai_base_url: OpenAI自定义Base URL
     """
 
     def update_progress(message, step=None, total_steps=None):
@@ -246,6 +248,22 @@ def run_stock_analysis(stock_symbol, analysis_date, analysts, research_depth, ll
             config["backend_url"] = "https://api.deepseek.com"
         elif llm_provider == "google":
             # Google AI不需要backend_url，使用默认的OpenAI格式
+            config["backend_url"] = "https://api.openai.com/v1"
+        elif llm_provider == "openai":
+            # OpenAI配置，支持自定义Base URL
+            # 优先级：Web界面配置 > 环境变量 > 默认值
+            openai_env_base_url = os.getenv('OPENAI_BASE_URL')
+            final_base_url = openai_base_url or openai_env_base_url or "https://api.openai.com/v1"
+            config["backend_url"] = final_base_url
+            logger.info(f"使用OpenAI配置，Base URL: {config['backend_url']}")
+            if openai_base_url:
+                logger.info(f"Base URL来源: Web界面配置")
+            elif openai_env_base_url:
+                logger.info(f"Base URL来源: 环境变量 OPENAI_BASE_URL")
+            else:
+                logger.info(f"Base URL来源: 默认值")
+        else:
+            # 默认使用OpenAI配置
             config["backend_url"] = "https://api.openai.com/v1"
 
         # 修复路径问题

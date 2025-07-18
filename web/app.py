@@ -614,7 +614,8 @@ def main():
                         llm_provider=config['llm_provider'],
                         market_type=form_data.get('market_type', '美股'),
                         llm_model=config['llm_model'],
-                        progress_callback=progress_callback
+                        progress_callback=progress_callback,
+                        openai_base_url=config.get('openai_base_url')
                     )
 
                     # 确保进度条显示100%完成
