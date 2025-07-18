@@ -69,16 +69,15 @@ def render_sidebar():
             
             with col1:
                 # 预设模型选择
-                preset_model = st.selectbox(
-                    "预设模型",
-                    options=["gpt-4.1", "gemini-2.5-pro-preview-06-05", "custom"],
+                llm_model = st.selectbox(
+                    "选择OpenAI模型",
+                    options=["gpt-4.1", "gemini-2.5-pro-preview-06-05"],
                     index=0,
                     format_func=lambda x: {
                         "gpt-4.1": "GPT-4 - 最强性能",
-                        "gemini-2.5-pro-preview-06-05": "Gemini 2.5 Pro - 最新预览版",
-                        "custom": "自定义模型"
+                        "gemini-2.5-pro-preview-06-05": "Gemini 2.5 Pro - 最新预览版"
                     }[x],
-                    help="选择预设的OpenAI模型或自定义"
+                    help="选择用于分析的OpenAI模型"
                 )
             
             with col2:
@@ -90,17 +89,6 @@ def render_sidebar():
                     placeholder="https://api.openai.com/v1",
                     help="OpenAI API的Base URL，可以是官方API或兼容的第三方API。默认从环境变量OPENAI_BASE_URL读取"
                 )
-            
-            # 如果选择自定义模型，显示输入框
-            if preset_model == "custom":
-                llm_model = st.text_input(
-                    "自定义模型名称",
-                    value="gpt-4",
-                    placeholder="输入模型名称，如: gpt-4, claude-3-opus等",
-                    help="输入要使用的模型名称"
-                )
-            else:
-                llm_model = preset_model
             
             # 存储自定义配置到session state
             st.session_state.openai_base_url = custom_base_url
