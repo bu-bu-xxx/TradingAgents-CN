@@ -65,33 +65,16 @@ def render_sidebar():
             )
         else:  # openai
             # OpenAI配置
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                # 预设模型选择
-                llm_model = st.selectbox(
-                    "选择OpenAI模型",
-                    options=["gpt-4.1", "gemini-2.5-pro-preview-06-05"],
-                    index=0,
-                    format_func=lambda x: {
-                        "gpt-4.1": "GPT-4 - 最强性能",
-                        "gemini-2.5-pro-preview-06-05": "Gemini 2.5 Pro - 最新预览版"
-                    }[x],
-                    help="选择用于分析的OpenAI模型"
-                )
-            
-            with col2:
-                # 自定义Base URL
-                default_base_url = os.getenv('OPENAI_BASE_URL', 'https://api.openai.com/v1')
-                custom_base_url = st.text_input(
-                    "自定义Base URL",
-                    value=default_base_url,
-                    placeholder="https://api.openai.com/v1",
-                    help="OpenAI API的Base URL，可以是官方API或兼容的第三方API。默认从环境变量OPENAI_BASE_URL读取"
-                )
-            
-            # 存储自定义配置到session state
-            st.session_state.openai_base_url = custom_base_url
+            llm_model = st.selectbox(
+                "选择OpenAI模型",
+                options=["gpt-4.1", "gemini-2.5-pro-preview-06-05"],
+                index=0,
+                format_func=lambda x: {
+                    "gpt-4.1": "GPT-4 - 最强性能",
+                    "gemini-2.5-pro-preview-06-05": "Gemini 2.5 Pro - 最新预览版"
+                }[x],
+                help="选择用于分析的OpenAI模型"
+            )
         
         # 高级设置
         with st.expander("⚙️ 高级设置"):
@@ -250,5 +233,5 @@ def render_sidebar():
         'enable_memory': enable_memory,
         'enable_debug': enable_debug,
         'max_tokens': max_tokens,
-        'openai_base_url': st.session_state.get('openai_base_url', 'https://api.openai.com/v1')
+        'openai_base_url': os.getenv('OPENAI_BASE_URL', 'https://api.openai.com/v1')
     }

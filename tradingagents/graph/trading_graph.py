@@ -67,11 +67,33 @@ class TradingAgentsGraph:
 
         # Initialize LLMs
         if self.config["llm_provider"].lower() == "openai" or self.config["llm_provider"] == "ollama" or self.config["llm_provider"] == "openrouter":
-            self.deep_thinking_llm = ChatOpenAI(model=self.config["deep_think_llm"], base_url=self.config["backend_url"])
-            self.quick_thinking_llm = ChatOpenAI(model=self.config["quick_think_llm"], base_url=self.config["backend_url"])
+            openai_api_key = os.getenv('OPENAI_API_KEY')
+            if not openai_api_key:
+                raise ValueError("使用OpenAI需要设置OPENAI_API_KEY环境变量")
+            self.deep_thinking_llm = ChatOpenAI(
+                model=self.config["deep_think_llm"], 
+                base_url=self.config["backend_url"],
+                api_key=openai_api_key
+            )
+            self.quick_thinking_llm = ChatOpenAI(
+                model=self.config["quick_think_llm"], 
+                base_url=self.config["backend_url"],
+                api_key=openai_api_key
+            )
         elif self.config["llm_provider"].lower() == "anthropic":
-            self.deep_thinking_llm = ChatAnthropic(model=self.config["deep_think_llm"], base_url=self.config["backend_url"])
-            self.quick_thinking_llm = ChatAnthropic(model=self.config["quick_think_llm"], base_url=self.config["backend_url"])
+            anthropic_api_key = os.getenv('ANTHROPIC_API_KEY')
+            if not anthropic_api_key:
+                raise ValueError("使用Anthropic需要设置ANTHROPIC_API_KEY环境变量")
+            self.deep_thinking_llm = ChatAnthropic(
+                model=self.config["deep_think_llm"], 
+                base_url=self.config["backend_url"],
+                api_key=anthropic_api_key
+            )
+            self.quick_thinking_llm = ChatAnthropic(
+                model=self.config["quick_think_llm"], 
+                base_url=self.config["backend_url"],
+                api_key=anthropic_api_key
+            )
         elif self.config["llm_provider"].lower() == "google":
             google_api_key = os.getenv('GOOGLE_API_KEY')
             self.deep_thinking_llm = ChatGoogleGenerativeAI(
