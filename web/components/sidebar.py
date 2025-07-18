@@ -41,10 +41,12 @@ def render_sidebar():
         elif llm_provider == "deepseek":
             llm_model = st.selectbox(
                 "选择DeepSeek模型",
-                options=["deepseek-chat"],
+                options=["deepseek-chat", "gpt-4.1", "gemini-2.5-pro-preview-06-05"],
                 index=0,
                 format_func=lambda x: {
-                    "deepseek-chat": "DeepSeek Chat - 通用对话模型，适合股票分析"
+                    "deepseek-chat": "DeepSeek Chat - 通用对话模型，适合股票分析",
+                    "gpt-4.1": "GPT-4.1 - 强大性能",
+                    "gemini-2.5-pro-preview-06-05": "Gemini 2.5 Pro - 最新预览版"
                 }[x],
                 help="选择用于分析的DeepSeek模型"
             )

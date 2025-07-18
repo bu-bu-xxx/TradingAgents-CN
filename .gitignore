@@ -1,3 +1,4 @@
+venv/
 # Python环境和缓存
 env/
 __pycache__/
