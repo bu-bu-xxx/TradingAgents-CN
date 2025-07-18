@@ -164,19 +164,9 @@ def run_stock_analysis(stock_symbol, analysis_date, analysts, research_depth, ll
     logger.info(f"  FINNHUB_API_KEY: {'已设置' if finnhub_key else '未设置'}")
     logger.info(f"  OPENAI_API_KEY: {'已设置' if openai_key else '未设置'}")
 
-    # 根据配置的LLM提供商验证相应的API key
-    if config.get("llm_provider", "").lower() == "openai":
-        if not openai_key:
-            raise ValueError("使用OpenAI模型需要设置OPENAI_API_KEY环境变量")
-    elif config.get("llm_provider", "").lower() == "dashscope":
-        if not dashscope_key:
-            raise ValueError("使用DashScope模型需要设置DASHSCOPE_API_KEY环境变量")
-    
     # Finnhub API key 总是需要的（用于获取股票数据）
     if not finnhub_key:
         raise ValueError("FINNHUB_API_KEY 环境变量未设置")
-
-    update_progress("环境变量验证通过")
 
     try:
         # 导入必要的模块
@@ -189,6 +179,16 @@ def run_stock_analysis(stock_symbol, analysis_date, analysts, research_depth, ll
         config["llm_provider"] = llm_provider
         config["deep_think_llm"] = llm_model
         config["quick_think_llm"] = llm_model
+        
+        # 根据配置的LLM提供商验证相应的API key
+        if config.get("llm_provider", "").lower() == "openai":
+            if not openai_key:
+                raise ValueError("使用OpenAI模型需要设置OPENAI_API_KEY环境变量")
+        elif config.get("llm_provider", "").lower() == "dashscope":
+            if not dashscope_key:
+                raise ValueError("使用DashScope模型需要设置DASHSCOPE_API_KEY环境变量")
+
+        update_progress("环境变量验证通过")
         # 根据研究深度调整配置
         if research_depth == 1:  # 1级 - 快速分析
             config["max_debate_rounds"] = 1
